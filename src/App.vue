@@ -1,5 +1,5 @@
 <template>
-  <div class="px-16 py-24">
+  <div class="md:px-32 px-4 md:py-16 py-12">
     <router-view />
   </div>
 </template>
