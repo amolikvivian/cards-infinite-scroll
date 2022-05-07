@@ -82,16 +82,19 @@
   <svg
     v-if="name === 'subscription'"
     xmlns="http://www.w3.org/2000/svg"
-    class="h-6 w-6"
-    fill="none"
+    aria-hidden="true"
+    role="img"
+    class="h-5 w-5"
+    preserveAspectRatio="xMidYMid meet"
     viewBox="0 0 24 24"
-    stroke="currentColor"
-    stroke-width="2.5"
   >
     <path
+      fill="none"
+      stroke="currentColor"
       stroke-linecap="round"
       stroke-linejoin="round"
-      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+      stroke-width="2.5"
+      d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"
     />
   </svg>
   <svg

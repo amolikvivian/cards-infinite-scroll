@@ -1,69 +1,39 @@
 import { createStore } from "vuex";
-
 export default createStore({
   state: {
-    owner_id: 1,
-    data: {
-      list: [
-        {
-          name: "Mixmax",
-          budget_name: "Software subscription",
-          owner_id: 1,
-          owner_name: "Vikas",
-          spent: {
-            value: 100,
-            currency: "SGD",
-          },
-          available_to_spend: {
-            value: 1000,
-            currency: "SGD",
-          },
-          card_type: "burner",
-          expiry: "9 Feb, 2022",
-          limit: 100,
-          status: "active",
-        },
-        {
-          name: "Quickbooks",
-          budget_name: "Software subscription",
-          owner_id: 2,
-          owner_name: "Rajesh",
-          spent: {
-            value: 0,
-            currency: "SGD",
-          },
-          available_to_spend: {
-            value: 1,
-            currency: "SGD",
-          },
-          card_type: "subscription",
-          expiry: "9 feb",
-          limit: 10,
-          status: "active",
-        },
-      ],
-      page: 1,
-      per_page: 10,
-      total: 100,
+    owner_id: 2,
+    all: [],
+    owner_data: [],
+    blocked_data: [],
+  },
+  mutations: {
+    SET_DATA(state, data) {
+      state.all = data;
     },
   },
-  mutations: {},
-  actions: {},
+  actions: {
+    async getData({ commit }) {
+      const res = await fetch(
+        `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data`
+      );
+      commit("SET_DATA", await res.json());
+    },
+  },
   modules: {},
   getters: {
-    data(state) {
-      return state.data.list;
+    all(state) {
+      return state.all
     },
     cardholderNames(state) {
       return [
         ...new Set(
-          state.data.list.map((ele) => {
+          state.all?.map((ele) => {
             return ele.owner_name;
           })
         ),
       ];
     },
-    currentID(state) {
+    currentId(state) {
       return state.owner_id;
     },
   },
