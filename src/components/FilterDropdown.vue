@@ -24,9 +24,9 @@
         <span class="text-sm text-gray-500"><b>Cardholder</b></span>
         <select
           v-model="selectedCardholder"
-          class="form-select px-1 py-1.5 text-sm font-normal mt-3 text-gray-700 bg-white border border-solid border-gray-300 rounded focus:border-blue-600 focus:outline-none"
+          class="px-1 py-1.5 text-sm font-normal mt-3 text-gray-700 bg-white border border-solid border-gray-300 rounded focus:border-blue-600 focus:outline-none"
         >
-          <option selected disabled :value="null">Select Cardholder</option>
+          <option selected :value="null">Select Cardholder</option>
           <option v-for="(name, i) in names" :key="i" :value="name">
             {{ name }}
           </option>
@@ -56,11 +56,12 @@
 export default {
   props: {
     cardTypes: Array,
+    selected: Object,
   },
   data() {
     return {
-      selectedType: null,
-      selectedCardholder: null,
+      selectedType: this.selected.type,
+      selectedCardholder: this.selected.name,
     };
   },
   computed: {
@@ -70,10 +71,14 @@ export default {
     disabled() {
       return this.selectedType == null && this.selectedCardholder == null;
     },
-  },
+  },  
   methods: {
     selectType(val) {
-      this.selectedType = val;
+      if (this.selectedType == val) {
+        this.selectedType = null;
+      } else {
+        this.selectedType = val;
+      }
     },
     apply() {
       const filterPayload = {

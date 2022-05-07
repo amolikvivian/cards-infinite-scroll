@@ -21,19 +21,20 @@
     </button>
     <button
       class="px-3 py-1 bg-white text-gray-700 flex items-center text-sm rounded-md"
-      @click="cancel(), closeSearch()"
+      @click="closeSearch(), cancelFilter()"
     >
       <Icon name="reset" />
       <span class="pl-1">Reset</span>
     </button>
     <div
       v-if="showFilterMenu"
-      class="z-999 bg-white border rounded shadow-lg h-80 w-80 absolute mt-96 mr-12 px-4 py-4"
+      class="z-10 bg-white border rounded shadow-lg h-80 w-80 absolute mt-96 mr-12 px-4 py-4"
     >
       <FilterDropdown
         :cardTypes="cardTypes"
+        :selected="selected"
         @apply="applyFilter"
-        @cancel="cancel"
+        @cancel="cancelFilter"
       />
     </div>
   </div>
@@ -53,6 +54,10 @@ export default {
         { name: "Burner", val: "burner" },
         { name: "Subscription", val: "subscription" },
       ],
+      selected: {
+        type: null,
+        name: null,
+      },
     };
   },
   methods: {
@@ -60,7 +65,7 @@ export default {
       this.showFilterMenu = !this.showFilterMenu;
     },
     closeSearch() {
-      this.searchQuery = "";
+      this.searchQuery = null;
       this.showSearch = false;
     },
     toggleSearch() {
@@ -75,13 +80,15 @@ export default {
       this.$emit("search", this.searchQuery);
     },
     applyFilter(filterPayload) {
+      this.selected = filterPayload;
+      this.showFilterMenu = false;
       this.$emit("filterData", filterPayload);
-      this.showFilterMenu = false;
     },
-    cancel() {
-      this.$emit("filterData", null);
-      this.searchQuery = "";
+    cancelFilter() {
+      this.selected = { type: null, name: null };
       this.showFilterMenu = false;
+      this.searchQuery = null;
+      this.$emit("filterData", null);
     },
   },
 };

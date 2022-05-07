@@ -9,7 +9,7 @@
           >{{ card.owner_name }} - {{ card.budget_name }}</span
         >
       </div>
-      <div class="rounded-full p-2 shadow-md bg-red-100 text-red-500">
+      <div class="rounded-full p-2 shadow-md bg-red-50 text-red-500">
         <Icon :name="card.card_type" />
       </div>
     </div>
