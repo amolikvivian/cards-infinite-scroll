@@ -2,16 +2,21 @@ import { createRouter, createWebHashHistory } from "vue-router";
 
 const routes = [
   {
-    path: '/cards/:id',
-    name: "Cards",
-    component: () => import("../views/Cards.vue")
-    
+    path: "/",
+    name: "Home",
+    component: () => import("../views/Home.vue"),
+    alias: ["/home"],
   },
   {
-    path: '/:pathMatch(.*)*',
+    path: "/cards/:id",
+    name: "Cards",
+    component: () => import("../views/Cards.vue"),
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "404",
     component: () => import("../views/NotFound.vue"),
-    alias: ['/']
-  }
+  },
 ];
 
 const router = createRouter({
