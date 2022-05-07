@@ -12,9 +12,8 @@ const routes = [
     component: () => import("../views/Cards.vue")
   },
   {
-    path: '/comments',
-    name: "Comments",
-    component: () => import("../views/Comments.vue")
+    path: '/:pathMatch(.*)*',
+    component: () => import("../views/NotFound.vue")
   }
 ];
 
