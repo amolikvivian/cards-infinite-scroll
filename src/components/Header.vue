@@ -6,7 +6,7 @@
         class="bg-gray-100 rounded-sm text-blue-600 border-none px-1 py-1 text-xs md:ml-4 flex items-center"
       >
         <Icon name="vid-rec" />
-        <span class="pl-1">Learn More</span>
+        <span class="pl-1"><b>Learn More</b></span>
       </button>
     </div>
     <button

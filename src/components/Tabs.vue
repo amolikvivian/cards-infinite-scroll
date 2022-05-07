@@ -19,21 +19,28 @@ export default {
     return {
       tabs: [
         {
+          id: 0,
           name: "Your",
         },
         {
+          id: 1,
           name: "All",
         },
         {
+          id: 2,
           name: "Blocked",
         },
       ],
-      selectedTab: "All",
+      selectedTab: null,
     };
+  },
+  created() {
+    this.selectTab(this.tabs[1])
   },
   methods: {
     selectTab(tab) {
       this.selectedTab = tab.name;
+      this.$emit('select', tab.id)
     },
   },
 };

@@ -23,16 +23,21 @@
       <div class="flex flex-col mt-8">
         <span class="text-sm text-gray-500"><b>Cardholder</b></span>
         <select
+          v-model="selectedCardholder"
           class="form-select px-1 py-1.5 text-sm font-normal mt-3 text-gray-700 bg-white border border-solid border-gray-300 rounded focus:border-blue-600 focus:outline-none"
         >
-          <option selected disabled>Select Cardholder</option>
-          <option value="1">One</option>
+          <option selected disabled :value="null">Select Cardholder</option>
+          <option v-for="(name, i) in names" :key="i" :value="name">
+            {{ name }}
+          </option>
         </select>
       </div>
       <div class="flex items-center justify-between mt-12">
         <button
           @click="apply()"
+          :disabled="disabled"
           class="text-sm px-4 py-1 bg-red-500 text-white w-28 rounded-md shadow"
+          :class="disabled ? 'opacity-50' : ''"
         >
           Apply
         </button>
@@ -55,11 +60,30 @@ export default {
   data() {
     return {
       selectedType: null,
+      selectedCardholder: null,
     };
-  },  
+  },
+  computed: {
+    names() {
+      return this.$store.getters.cardholderNames;
+    },
+    disabled() {
+      return this.selectedType == null && this.selectedCardholder == null;
+    },
+  },
   methods: {
     selectType(val) {
       this.selectedType = val;
+    },
+    apply() {
+      const filterPayload = {
+        type: this.selectedType,
+        name: this.selectedCardholder,
+      };
+      this.$emit("apply", filterPayload);
+    },
+    clear() {
+      this.$emit("cancel");
     },
   },
 };
