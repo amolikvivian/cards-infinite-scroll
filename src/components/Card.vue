@@ -6,7 +6,7 @@
         <span class="text-sm text-gray-500 mt-1">Rajesh - Sales Singapore</span>
       </div>
       <div class="rounded-full p-2 shadow-md bg-red-100 text-red-500">
-        <Icon name="flame" />
+        <Icon name="subscription" />
       </div>
     </div>
 
