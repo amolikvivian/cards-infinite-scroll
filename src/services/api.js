@@ -1,6 +1,6 @@
-async function getAllData(page) {
+async function getAllData(page, limit) {
   const res = await fetch(
-    `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data?_limit=4&_page=${page}`
+    `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data?_limit=${limit}&_page=${page}`
   );
   return await res.json();
 }
@@ -26,16 +26,16 @@ async function getDataByTypeName(type, name) {
   return await res.json();
 }
 
-async function getDataByOwnerId(owner_id, page) {
+async function getDataByOwnerId(owner_id, page, limit) {
   const res = await fetch(
-    `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data?owner_id=${owner_id}&?_limit=4&_page=${page}`
+    `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data?owner_id=${owner_id}&?_limit=${limit}&_page=${page}`
   );
   return await res.json();
 }
 
-async function getDataByStatus(status, page) {
+async function getDataByStatus(status, page, limit) {
   const res = await fetch(
-    `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data?status=${status}&?_limit=4&_page=${page}`
+    `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data?status=${status}&?_limit=${limit}&_page=${page}`
   );
   return await res.json();
 }
