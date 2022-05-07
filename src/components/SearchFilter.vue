@@ -1,6 +1,16 @@
 <template>
   <div class="flex justify-end items-center">
-    <!-- <button class="pr-4"><Icon name="search" /></button> -->
+    <input
+      v-if="showSearch"
+      type="text"
+      ref="searchInput"
+      placeholder="Search by card name"
+      v-model="searchQuery"
+      class="border-b-2 border-red-500 focus:outline-none mr-4 px-0.5"
+    />
+    <button class="pr-4" @click="toggleSearch()">
+      <Icon name="search" />
+    </button>
     <button
       class="px-3 py-2 bg-gray-100 text-gray-700 flex items-center text-sm rounded-md"
       @click="toggleFilterMenu()"
@@ -24,6 +34,8 @@ export default {
   components: { Icon, FilterDropdown },
   data() {
     return {
+      searchQuery: null,
+      showSearch: false,
       showFilterMenu: false,
       cardTypes: [
         { name: "Burner", val: "burner" },
@@ -34,6 +46,14 @@ export default {
   methods: {
     toggleFilterMenu() {
       this.showFilterMenu = !this.showFilterMenu;
+    },
+    toggleSearch() {
+      this.showSearch = !this.showSearch;
+      if (this.showSearch) {
+        this.$nextTick(() => {
+          this.$refs.searchInput.focus();
+        });
+      }
     },
   },
 };
