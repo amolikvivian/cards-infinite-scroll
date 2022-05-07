@@ -1,15 +1,17 @@
 <template>
   <div class="px-4">
     <div class="mt-6">
-      <SearchFilter @search="search" @filterData="filterData" />
+      <SearchFilter @search="search" @filter="filter" @clear="clear" />
     </div>
-    <div class="mt-8 flex flex-wrap justify-between">
+    <div class="my-8 flex flex-wrap justify-between">
       <Card v-for="(data, i) in list" :key="i" :card="data" />
     </div>
-    <Observer @intersected="fetchData" />
+    <Observer @intersect="intersected" :key="$route.params.id" />
     <div class="flex items-center justify-center min-w-screen">
       <span class="text-lg text-gray-400" v-if="loading"><Loader /></span>
-      <span class="text-lg text-gray-400" v-if="list.length == 0 && !loading"
+      <span
+        class="text-lg text-gray-400"
+        v-if="list.length == 0 && loading == false"
         >No Data Found!</span
       >
     </div>
@@ -22,9 +24,9 @@ import SearchFilter from "@/components/SearchFilter";
 import Observer from "@/components/Observer";
 import Loader from "@/components/Loader";
 import {
-  getDataByName,
-  getDataByType,
-  getDataByTypeName,
+  getAllData,
+  getDataByOwnerId,
+  getDataByStatus,
 } from "@/services/api.js";
 export default {
   name: "Home",
@@ -38,68 +40,79 @@ export default {
     return {
       list: [],
       loading: true,
+      page: 1,
+      loadFlag: true,
     };
   },
   created() {
-    this.fetchData();
+    this.$store.dispatch("getData");
   },
   computed: {
-    currentID() {
-      return this.$store.getters.currentID;
+    currentId() {
+      return this.$store.getters.currentId;
+    },
+    tab() {
+      return this.$route.params.id;
     },
   },
   watch: {
-    "$route.params.id": function () {
-      this.fetchData();
+    tab: function () {
+      this.loading = true;
+      this.loadFlag = true;
+      this.list = [];
+      this.page = 1;
     },
   },
   methods: {
-    async fetchData() {
-      let id = this.$route.params.id;
-      this.list = [];
-      this.loading = true;
-      if (id == "your") {
-        await this.$store.dispatch("getOwnerData", this.currentID);
-        this.list = this.$store.getters.ownerData;
-        this.loading = false;
-      } else if (id == "all") {
-        await this.$store.dispatch("getData");
-        this.list = this.$store.getters.all;
-        this.loading = false;
-      } else if (id == "blocked") {
-        await this.$store.dispatch("getBlockedData");
-        this.list = this.$store.getters.blockedData;
+    async intersected() {
+      if (this.loadFlag) {
+        this.loading = true;
+        let append = [];
+        if (this.tab === "all") {
+          append = await getAllData(this.page);
+        } else if (this.tab === "your") {
+          append = await getDataByOwnerId(this.currentId, this.page);
+        } else if (this.tab === "blocked") {
+          append = await getDataByStatus("blocked", this.page);
+        }
+
+        this.list = [...this.list, ...append];
+        this.page += 1;
         this.loading = false;
       }
     },
-    search(query) {
-      if (query == null || query.length == 0) {
-        this.fetchData();
+    async search(query) {
+      if (query.length === 0) {
+        this.loadFlag = true;
+        const append = await getAllData(1);
+        this.list = [...append];
       } else {
-        this.list = this.all.filter((ele) => {
-          return ele.name.toLowerCase().includes(query.toLowerCase());
+        this.loadFlag = false;
+        this.list = this.$store.getters.all.filter((card) => {
+          return card.name.toLowerCase().includes(query.toLowerCase());
         });
       }
     },
-    async filterData(filterPayload) {
-      this.list = [];
-      this.loading = true;
-      if (filterPayload == null) {
-        this.list = this.$store.getters.all;
-        this.loading = false;
+    async filter({ type, name }) {
+      this.loadFlag = false;
+      if (type != null && name == null) {
+        this.list = this.$store.getters.all.filter((card) => {
+          return card.card_type === type;
+        });
+      } else if (type == null && name != null) {
+        this.list = this.$store.getters.all.filter((card) => {
+          return card.owner_name === name;
+        });
       } else {
-        const { type, name } = filterPayload;
-        if (type == null && name != null) {
-          this.list = await getDataByName(name);
-          this.loading = false;
-        } else if (filterPayload.type != null && filterPayload.name == null) {
-          this.list = await getDataByType(type);
-          this.loading = false;
-        } else if (filterPayload != null && filterPayload.name != null) {
-          this.list = await getDataByTypeName(type, name);
-          this.loading = false;
-        }
+        this.list = this.$store.getters.all.filter((card) => {
+          return card.owner_name === name && card.card_type === type;
+        });
       }
+    },
+    async clear() {
+      this.loadFlag = true;
+      const append = await getAllData(1);
+      this.list = [...append];
     },
   },
 };

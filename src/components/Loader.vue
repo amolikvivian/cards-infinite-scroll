@@ -9,7 +9,7 @@ export default {};
 <style>
 .loader {
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #5e5e5e;
+  border-top: 3px solid #707070;
   border-radius: 50%;
   width: 30px;
   height: 30px;

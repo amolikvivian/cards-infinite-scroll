@@ -21,7 +21,7 @@
     </button>
     <button
       class="ml-2 py-1 bg-white text-gray-700 flex items-center text-sm rounded-md"
-      @click="closeSearch(), cancelFilter()"
+      @click="closeSearch(), clearFilter()"
     >
       <span class="pl-1">Reset</span>
     </button>
@@ -33,7 +33,7 @@
         :cardTypes="cardTypes"
         :selected="selected"
         @apply="applyFilter"
-        @cancel="cancelFilter"
+        @cancel="clearFilter"
       />
     </div>
   </div>
@@ -83,16 +83,16 @@ export default {
     getSearchQuery() {
       this.$emit("search", this.searchQuery);
     },
-    applyFilter(filterPayload) {
-      this.selected = filterPayload;
+    applyFilter(filterObject) {
       this.showFilterMenu = false;
-      this.$emit("filterData", filterPayload);
+      this.selected = filterObject;
+      this.$emit("filter", filterObject);
     },
-    cancelFilter() {
-      this.selected = { type: null, name: null };
+    clearFilter() {
       this.showFilterMenu = false;
+      this.selected = { type: null, name: null };
       this.searchQuery = null;
-      this.$emit("filterData", null);
+      this.$emit("clear");
     },
   },
 };

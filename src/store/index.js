@@ -1,9 +1,7 @@
 import { createStore } from "vuex";
-import { getAllData, getDataByOwner, getDataByStatus } from "@/services/api";
-
 export default createStore({
   state: {
-    owner_id: 1,
+    owner_id: 2,
     all: [],
     owner_data: [],
     blocked_data: [],
@@ -12,37 +10,19 @@ export default createStore({
     SET_DATA(state, data) {
       state.all = data;
     },
-    SET_OWNER_DATA(state, data) {
-      state.owner_data = data;
-    },
-    SET_BLOCKED_DATA(state, data) {
-      state.blocked_data = data;
-    },
   },
   actions: {
     async getData({ commit }) {
-      const res = await getAllData();
-      commit("SET_DATA", res);
-    },
-    async getOwnerData({ commit }, owner_id) {
-      const res = await getDataByOwner(owner_id);
-      commit("SET_OWNER_DATA", res);
-    },
-    async getBlockedData({ commit }) {
-      const res = await getDataByStatus("blocked");
-      commit("SET_BLOCKED_DATA", res);
+      const res = await fetch(
+        `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data`
+      );
+      commit("SET_DATA", await res.json());
     },
   },
   modules: {},
   getters: {
     all(state) {
-      return state.all;
-    },
-    ownerData(state) {
-      return state.owner_data;
-    },
-    blockedData(state) {
-      return state.blocked_data;
+      return state.all
     },
     cardholderNames(state) {
       return [
@@ -53,7 +33,7 @@ export default createStore({
         ),
       ];
     },
-    currentID(state) {
+    currentId(state) {
       return state.owner_id;
     },
   },
