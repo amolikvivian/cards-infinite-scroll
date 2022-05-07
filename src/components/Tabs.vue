@@ -1,5 +1,5 @@
 <template>
-  <ul class="flex flex-wrap text-sm tracking-wide font-medium text-center text-gray-500">
+  <ul class="flex flex-wrap text-sm font-medium text-center text-gray-500">
     <li v-for="tab in tabs" :key="tab" class="cursor-pointer">
       <span
         @click="selectTab(tab)"
