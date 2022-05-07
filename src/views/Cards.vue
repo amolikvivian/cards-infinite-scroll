@@ -95,24 +95,37 @@ export default {
     },
     async filter({ type, name }) {
       this.loadFlag = false;
+      let all;
+
+      if (this.tab == "your")
+        all = await getDataByOwnerId(this.currentId, null);
+
+      if (this.tab == "all") all = this.$store.getters.all;
+
       if (type != null && name == null) {
-        this.list = this.$store.getters.all.filter((card) => {
+        this.list = all.filter((card) => {
           return card.card_type === type;
         });
       } else if (type == null && name != null) {
-        this.list = this.$store.getters.all.filter((card) => {
+        this.list = all.filter((card) => {
           return card.owner_name === name;
         });
       } else {
-        this.list = this.$store.getters.all.filter((card) => {
+        this.list = all.filter((card) => {
           return card.owner_name === name && card.card_type === type;
         });
       }
     },
     async clear() {
       this.loadFlag = true;
-      const append = await getAllData(1);
-      this.list = [...append];
+      if (this.tab == "your") {
+        const append = await getDataByOwnerId(this.currentId, 1);
+        this.list = [...append];
+      }
+      if (this.tab == "all") {
+        const append = await getAllData(1);
+        this.list = [...append];
+      }
     },
   },
 };
