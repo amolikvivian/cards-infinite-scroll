@@ -11,7 +11,7 @@
       <span class="text-lg text-gray-400" v-if="loading"><Loader /></span>
       <span
         class="text-lg text-gray-400"
-        v-if="list.length == 0 && loading == false"
+        v-if="list.length === 0 && loading === false"
         >No Data Found!</span
       >
     </div>
@@ -39,8 +39,9 @@ export default {
   data() {
     return {
       list: [],
-      loading: true,
       page: 1,
+      limit: 10,
+      loading: true,
       loadFlag: true,
     };
   },
@@ -54,9 +55,12 @@ export default {
     tab() {
       return this.$route.params.id;
     },
+    checkLimit() {
+      return this.list.length === this.$store.getters.all.length
+    }
   },
   watch: {
-    tab: function () {
+    tab() {
       this.loading = true;
       this.loadFlag = true;
       this.list = [];
@@ -66,17 +70,16 @@ export default {
   methods: {
     async intersected() {
       if (this.loadFlag) {
-        this.loading = true;
-        let append = [];
+        this.loading = !this.checkLimit;
+        let fetched = [];
         if (this.tab === "all") {
-          append = await getAllData(this.page);
-        } else if (this.tab === "your") {
-          append = await getDataByOwnerId(this.currentId, this.page);
+          fetched = await getAllData(this.page);
+        } else if (this.tab === "owned") {
+          fetched = await getDataByOwnerId(this.currentId, this.page);
         } else if (this.tab === "blocked") {
-          append = await getDataByStatus("blocked", this.page);
+          fetched = await getDataByStatus("blocked", this.page);
         }
-
-        this.list = [...this.list, ...append];
+        this.list = [...this.list, ...fetched];
         this.page += 1;
         this.loading = false;
       }
@@ -84,8 +87,8 @@ export default {
     async search(query) {
       if (query.length === 0) {
         this.loadFlag = true;
-        const append = await getAllData(1);
-        this.list = [...append];
+        const fetched = await getAllData(1);
+        this.list = [...fetched];
       } else {
         this.loadFlag = false;
         this.list = this.$store.getters.all.filter((card) => {
@@ -97,7 +100,7 @@ export default {
       this.loadFlag = false;
       let all;
 
-      if (this.tab == "your")
+      if (this.tab == "owned")
         all = await getDataByOwnerId(this.currentId, null);
 
       if (this.tab == "all") all = this.$store.getters.all;
@@ -118,14 +121,15 @@ export default {
     },
     async clear() {
       this.loadFlag = true;
-      if (this.tab == "your") {
-        const append = await getDataByOwnerId(this.currentId, 1);
-        this.list = [...append];
+      this.loading = true;
+      let fetched = [];
+      if (this.tab == "owned") {
+        fetched = await getDataByOwnerId(this.currentId, 1);
+      } else if (this.tab == "all") {
+        fetched = await getAllData(1);
       }
-      if (this.tab == "all") {
-        const append = await getAllData(1);
-        this.list = [...append];
-      }
+      this.loading = false;
+      this.list = [...fetched];
     },
   },
 };

@@ -19,7 +19,7 @@ export default {
     return {
       tabs: [
         {
-          id: 'your',
+          id: 'owned',
           name: "Your",
         },
         {

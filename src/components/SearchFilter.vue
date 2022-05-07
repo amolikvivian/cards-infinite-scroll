@@ -21,7 +21,7 @@
     </button>
     <button
       class="ml-2 py-1 bg-white text-gray-700 flex items-center text-sm rounded-md"
-      @click="closeSearch(), clearFilter()"
+      @click="clearFilter(), closeSearch()"
     >
       <span class="pl-1">Reset</span>
     </button>
