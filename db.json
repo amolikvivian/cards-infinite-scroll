@@ -1,8 +1,11 @@
 {
-  "data": [
-    1,2,3,4,5
+  "posts": [
+    {
+      "id": 1,
+      "title": "hello"
+    }
   ],
-  "page": 1,
-  "per_page": 10,
-  "total": 100
+  "profile": {
+    "name": "typicode"
+  }
 }
