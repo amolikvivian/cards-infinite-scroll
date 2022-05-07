@@ -19,15 +19,15 @@ export default {
     return {
       tabs: [
         {
-          id: 0,
+          id: 'your',
           name: "Your",
         },
         {
-          id: 1,
+          id: 'all',
           name: "All",
         },
         {
-          id: 2,
+          id: 'blocked',
           name: "Blocked",
         },
       ],

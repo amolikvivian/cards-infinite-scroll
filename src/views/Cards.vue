@@ -1,16 +1,17 @@
 <template>
-  <div>
+  <div class="px-4">
     <div class="mt-6">
       <SearchFilter @search="search" @filterData="filterData" />
     </div>
-    <div class="mt-10 flex flex-wrap justify-between px-6">
-      <Card v-for="(data, i) in list" :key="i" :card="data"/>
+    <div class="mt-8 flex flex-wrap justify-between">
+      <Card v-for="(data, i) in list" :key="i" :card="data" />
     </div>
-    <div
-      class="flex items-center justify-center min-w-screen"
-      v-if="list.length == 0"
-    >
-      <span class="text-xl">No Data Found!</span>
+    <Observer @intersected="fetchData" />
+    <div class="flex items-center justify-center min-w-screen">
+      <span class="text-lg text-gray-400" v-if="loading"><Loader /></span>
+      <span class="text-lg text-gray-400" v-if="list.length == 0 && !loading"
+        >No Data Found!</span
+      >
     </div>
   </div>
 </template>
@@ -18,15 +19,25 @@
 <script>
 import Card from "@/components/Card";
 import SearchFilter from "@/components/SearchFilter";
+import Observer from "@/components/Observer";
+import Loader from "@/components/Loader";
+import {
+  getDataByName,
+  getDataByType,
+  getDataByTypeName,
+} from "@/services/api.js";
 export default {
   name: "Home",
   components: {
     Card,
     SearchFilter,
+    Observer,
+    Loader,
   },
   data() {
     return {
       list: [],
+      loading: true,
     };
   },
   created() {
@@ -36,9 +47,6 @@ export default {
     currentID() {
       return this.$store.getters.currentID;
     },
-    all() {
-      return this.$store.getters.data;
-    },
   },
   watch: {
     "$route.params.id": function () {
@@ -46,18 +54,22 @@ export default {
     },
   },
   methods: {
-    fetchData() {
+    async fetchData() {
       let id = this.$route.params.id;
-      if (id == 0) {
-        this.list = this.all.filter((ele) => {
-          return ele.owner_id === this.currentID && ele.status === "active";
-        });
-      } else if (id == 1) {
-        this.list = this.all;
-      } else if (id == 2) {
-        this.list = this.all.filter((ele) => {
-          return ele.status === "blocked";
-        });
+      this.list = [];
+      this.loading = true;
+      if (id == "your") {
+        await this.$store.dispatch("getOwnerData", this.currentID);
+        this.list = this.$store.getters.ownerData;
+        this.loading = false;
+      } else if (id == "all") {
+        await this.$store.dispatch("getData");
+        this.list = this.$store.getters.all;
+        this.loading = false;
+      } else if (id == "blocked") {
+        await this.$store.dispatch("getBlockedData");
+        this.list = this.$store.getters.blockedData;
+        this.loading = false;
       }
     },
     search(query) {
@@ -69,27 +81,24 @@ export default {
         });
       }
     },
-    filterData(filterPayload) {
-      this.fetchData();
-      if(filterPayload == null) {
-        this.fetchData();
-      }
-      else if (filterPayload.type == null && filterPayload.name != null) {
-        this.list = this.list.filter((ele) => {
-          return ele.owner_name === filterPayload.name;
-        });
-      } else if (filterPayload.type != null && filterPayload.name == null) {
-        this.list = this.list.filter((ele) => {
-          return ele.card_type === filterPayload.type;
-        });
-      } else if (filterPayload != null && filterPayload.name != null) {
-        this.list = this.list
-          .filter((ele) => {
-            return ele.card_type === filterPayload.type;
-          })
-          .filter((e) => {
-            return e.owner_name == filterPayload.name;
-          });
+    async filterData(filterPayload) {
+      this.list = [];
+      this.loading = true;
+      if (filterPayload == null) {
+        this.list = this.$store.getters.all;
+        this.loading = false;
+      } else {
+        const { type, name } = filterPayload;
+        if (type == null && name != null) {
+          this.list = await getDataByName(name);
+          this.loading = false;
+        } else if (filterPayload.type != null && filterPayload.name == null) {
+          this.list = await getDataByType(type);
+          this.loading = false;
+        } else if (filterPayload != null && filterPayload.name != null) {
+          this.list = await getDataByTypeName(type, name);
+          this.loading = false;
+        }
       }
     },
   },

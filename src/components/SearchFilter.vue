@@ -20,10 +20,9 @@
       <span class="pl-1">Filter</span>
     </button>
     <button
-      class="px-3 py-1 bg-white text-gray-700 flex items-center text-sm rounded-md"
+      class="ml-2 py-1 bg-white text-gray-700 flex items-center text-sm rounded-md"
       @click="closeSearch(), cancelFilter()"
     >
-      <Icon name="reset" />
       <span class="pl-1">Reset</span>
     </button>
     <div
@@ -41,8 +40,8 @@
 </template>
 
 <script>
-import Icon from "./Icon";
-import FilterDropdown from "./FilterDropdown";
+import Icon from "@/components/Icon";
+import FilterDropdown from "@/components/FilterDropdown";
 export default {
   components: { Icon, FilterDropdown },
   data() {
@@ -59,6 +58,11 @@ export default {
         name: null,
       },
     };
+  },
+  watch: {
+    "$route.params.id": function () {
+      this.selected = { type: null, name: null };
+    },
   },
   methods: {
     toggleFilterMenu() {
