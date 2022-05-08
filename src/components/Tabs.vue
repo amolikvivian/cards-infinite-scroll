@@ -3,7 +3,7 @@
     <li v-for="tab in tabs" :key="tab" class="cursor-pointer">
       <span
         @click="selectTab(tab)"
-        class="inline-block py-3 w-24 text-gray-700 hover:bg-gray-100"
+        class="inline-block p-3 w-20 text-gray-700 hover:bg-gray-100"
         :class="this.currentTabIndex == tab.id ? 'active' : 'inactive'"
         >{{ tab.name }}</span
       >

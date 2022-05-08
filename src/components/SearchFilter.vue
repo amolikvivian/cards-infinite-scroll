@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-end items-center">
+  <div class="flex justify-end flex-wrap items-center">
     <input
       v-if="showSearch"
       type="text"
@@ -9,32 +9,32 @@
       v-model="searchQuery"
       class="border-b-2 border-red-500 focus:outline-none mr-4 px-0.5 text-sm"
     />
-    <button class="pr-4" @click="toggleSearch()">
-      <Icon name="search" />
-    </button>
-    <button
-      class="px-3 py-1 bg-gray-100 text-gray-700 flex items-center text-sm rounded-md mr-1"
-      @click="toggleFilterMenu()"
-    >
-      <Icon name="filter" />
-      <span class="pl-1">Filter</span>
-    </button>
-    <button
-      class="ml-2 py-1 bg-white text-gray-700 flex items-center text-sm rounded-md"
-      @click="clearFilter(), closeSearch()"
-    >
-      <span class="pl-1">Reset</span>
-    </button>
-    <div
-      v-if="showFilterMenu"
-      class="z-10 bg-white border rounded shadow-lg h-80 w-80 absolute mt-96 mr-12 px-4 py-4"
-    >
-      <FilterDropdown
-        :cardTypes="cardTypes"
-        :selected="selected"
-        @apply="applyFilter"
-        @cancel="clearFilter"
-      />
+      <button class="pr-4" @click="toggleSearch()">
+        <Icon name="search" />
+      </button>
+      <button
+        class="px-3 py-1 bg-gray-100 text-gray-700 flex items-center text-sm rounded-md mr-1"
+        @click="toggleFilterMenu()"
+      >
+        <Icon name="filter" />
+        <span class="ml-1">Filter</span>
+      </button>
+      <button
+        class="py-1 ml-1 bg-white text-gray-700 flex items-center text-sm rounded-md"
+        @click="clearFilter(), closeSearch()"
+      >
+        <span class="px-1">Reset</span>
+      </button>
+      <div
+        v-if="showFilterMenu"
+        class="z-10 bg-white border rounded shadow-lg h-80 w-80 absolute mt-96 mr-12 px-4 py-4"
+      >
+        <FilterDropdown
+          :cardTypes="cardTypes"
+          :selected="selected"
+          @apply="applyFilter"
+          @cancel="clearFilter"
+        />  
     </div>
   </div>
 </template>

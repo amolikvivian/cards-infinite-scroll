@@ -20,9 +20,13 @@
           </button>
         </div>
       </div>
-      <div class="flex flex-col mt-8">
+      <div
+        class="flex flex-col mt-8"
+        :class="tab == 'owned' ? 'opacity-40' : ''"
+      >
         <span class="text-sm text-gray-500"><b>Cardholder</b></span>
         <select
+          :disabled="tab == 'owned'"
           v-model="selectedCardholder"
           class="px-1 py-1.5 text-sm font-normal mt-3 text-gray-700 bg-white border border-solid border-gray-300 rounded focus:border-blue-600 focus:outline-none"
         >
@@ -35,15 +39,15 @@
       <div class="flex items-center justify-between mt-12">
         <button
           @click="apply()"
-          :disabled="disabled"
-          class="text-sm px-4 py-1 bg-red-500 text-white w-28 rounded-md shadow"
-          :class="disabled ? 'opacity-50' : ''"
+          :disabled="disableApply"
+          class="text-sm px-4 py-1 bg-red-500 text-white w-28 rounded-sm shadow"
+          :class="disableApply ? 'opacity-50' : ''"
         >
           Apply
         </button>
         <button
           @click="clear()"
-          class="text-sm px-4 py-1 bg-white text-gray-700 w-28 rounded-md shadow"
+          class="text-sm px-4 py-1 bg-white text-gray-700 w-28 rounded-sm shadow"
         >
           <b>Clear</b>
         </button>
@@ -68,10 +72,13 @@ export default {
     names() {
       return this.$store.getters.cardholderNames;
     },
-    disabled() {
+    disableApply() {
       return this.selectedType == null && this.selectedCardholder == null;
     },
-  },  
+    tab() {
+      return this.$route.params.id;
+    },
+  },
   methods: {
     selectType(val) {
       if (this.selectedType == val) {
