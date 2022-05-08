@@ -43,7 +43,7 @@ export default {
       limit: 4,
       loading: true,
       loadFlag: true,
-      checkLimit: false
+      checkLimit: false,
     };
   },
   created() {
@@ -59,24 +59,31 @@ export default {
   },
   watch: {
     tab() {
+      if (this.tab === "owned") {
+        this.$store.dispatch("getOwnerData", this.currentId);
+      }
       this.loading = true;
       this.loadFlag = true;
       this.list = [];
       this.page = 1;
     },
     list() {
-      this.checkLimit = (this.list.length === this.$store.getters.all.length)
-    }
+      this.checkLimit = this.list.length === this.$store.getters.all.length;
+    },
   },
   methods: {
     async intersected() {
       if (this.loadFlag && !this.checkLimit) {
-        this.loading = true
+        this.loading = true;
         let fetched = [];
         if (this.tab === "all") {
           fetched = await getAllData(this.page, this.limit);
         } else if (this.tab === "owned") {
-          fetched = await getDataByOwnerId(this.currentId, this.page, this.limit);
+          fetched = await getDataByOwnerId(
+            this.currentId,
+            this.page,
+            this.limit
+          );
         } else if (this.tab === "blocked") {
           fetched = await getDataByStatus("blocked", this.page, this.limit);
         }
@@ -88,19 +95,30 @@ export default {
     async search(query) {
       if (query.length === 0) {
         this.loadFlag = true;
-        const fetched = await getAllData(1, this.limit);
+        let fetched = [];
+        if (this.tab == "owned") {
+          fetched = await getDataByOwnerId(this.currentId, 1, this.limit);
+        } else if (this.tab == "all") {
+          fetched = await getAllData(1, this.limit);
+        }
+        this.loading = false;
         this.list = [...fetched];
       } else {
         this.loadFlag = false;
-        this.list = this.$store.getters.all.filter((card) => {
-          return card.name.toLowerCase().includes(query.toLowerCase());
-        });
+        if (this.tab == "owned") {
+          this.list = this.$store.getters.ownerData.filter((card) => {
+            return card.name.toLowerCase().includes(query.toLowerCase());
+          });
+        } else if (this.tab == "all") {
+          this.list = this.$store.getters.all.filter((card) => {
+            return card.name.toLowerCase().includes(query.toLowerCase());
+          });
+        }
       }
     },
     async filter({ type, name }) {
       this.loadFlag = false;
       let completeList;
-
       if (this.tab == "owned")
         completeList = await getDataByOwnerId(this.currentId, null);
 
@@ -121,15 +139,12 @@ export default {
       }
     },
     async clear() {
-      this.loadFlag = true;
-      this.loading = true;
       let fetched = [];
-      if (this.tab == "owned") {
+      if (this.tab === "owned")
         fetched = await getDataByOwnerId(this.currentId, 1, this.limit);
-      } else if (this.tab == "all") {
-        fetched = await getAllData(1, this.limit);
-      }
-      this.loading = false;
+
+      if (this.tab === "all") fetched = await getAllData(1, this.limit);
+
       this.list = [...fetched];
     },
   },
