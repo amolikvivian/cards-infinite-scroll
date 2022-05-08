@@ -107,6 +107,24 @@
       "expiry": "1 May, 2023",
       "limit": 178,
       "status": "active"
+    },
+    {
+      "name": "Mixer",
+      "budget_name": "Software subscription",
+      "owner_id": 3,
+      "owner_name": "Mayank",
+      "spent": {
+        "value": 18,
+        "currency": "SGD"
+      },
+      "available_to_spend": {
+        "value": 30,
+        "currency": "SGD"
+      },
+      "card_type": "subscription",
+      "expiry": "1 May, 2023",
+      "limit": 50,
+      "status": "blocked"
     }
   ]
 }
