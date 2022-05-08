@@ -26,6 +26,7 @@ The mock API was generated with [JSON Placeholder](https://jsonplaceholder.typic
 
 JSON Placeholder comes with its own method of pagination by using `_limit` and `_page` query parameters, which was used to with the infinite scroll component.
 
+### For this project, we have set the ```limit - 4``` as the mock data is a total 6 objects.
 
 Base URL -
 ``` https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data ```
