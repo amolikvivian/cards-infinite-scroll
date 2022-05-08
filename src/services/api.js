@@ -1,7 +1,7 @@
 async function getAllData(page, limit) {
   try {
     const res = await fetch(
-      `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data?_limit=${limit}&_page=${page}`
+      `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data?status=active&_limit=${limit}&_page=${page}`
     );
     return await res.json();
   } catch (e) {
