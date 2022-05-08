@@ -43,11 +43,13 @@ export default {
       limit: 4,
       loading: true,
       loadFlag: true,
-      checkLimit: false,
+      limitFlag: false,
     };
   },
   created() {
     this.$store.dispatch("getData");
+    this.$store.dispatch("getOwnerData", this.currentId);
+    this.$store.dispatch("getBlockedData");
   },
   computed: {
     currentId() {
@@ -59,26 +61,32 @@ export default {
   },
   watch: {
     tab() {
-      if (this.tab === "owned")
-        this.$store.dispatch("getOwnerData", this.currentId);
-
       this.loading = true;
       this.loadFlag = true;
       this.list = [];
       this.page = 1;
     },
     list() {
-      this.checkLimit = this.list.length === this.$store.getters.all.length;
+      if (this.tab === "owned") {
+        this.limitFlag =
+          this.list.length == this.$store.getters.ownerData.length;
+      }
+      if (this.tab === "all") {
+        this.limitFlag = this.list.length == this.$store.getters.all.length;
+      }
+      if (this.tab === "blocked") {
+        this.limitFlag =
+          this.list.length == this.$store.getters.blockedData.length;
+      }
     },
   },
   methods: {
     async intersected() {
-      if (this.loadFlag && !this.checkLimit) {
+      if (this.loadFlag && !this.limitFlag) {
         this.loading = true;
         let fetched = [];
         if (this.tab === "all") {
           fetched = await getAllData(this.page, this.limit);
-          console.log(fetched);
         } else if (this.tab === "owned") {
           fetched = await getDataByOwnerId(
             this.currentId,
@@ -96,16 +104,8 @@ export default {
     async search(query) {
       if (query.length === 0) {
         this.loadFlag = true;
+        await this.reset();
         this.page = 2;
-        let fetched = [];
-        if (this.tab == "owned") {
-          fetched = await getDataByOwnerId(this.currentId, 1, this.limit);
-        }
-        if (this.tab == "all") {
-          fetched = await getAllData(1, this.limit);
-        }
-        this.loading = false;
-        this.list = [...fetched];
       } else {
         this.loadFlag = false;
         if (this.tab == "owned") {
@@ -122,10 +122,11 @@ export default {
     async filter({ type, name }) {
       this.loadFlag = false;
       let completeList;
-      if (this.tab == "owned")
-        completeList = await getDataByOwnerId(this.currentId, null);
+      if (this.tab == "owned") completeList = this.$store.getters.ownerData;
 
       if (this.tab == "all") completeList = this.$store.getters.all;
+
+      if (this.tab == "blocked") completeList = this.$store.getters.blockedData;
 
       if (type != null && name == null) {
         this.list = completeList.filter((card) => {
@@ -143,12 +144,23 @@ export default {
     },
     async clear() {
       this.loadFlag = true;
-      let fetched = [];
+      await this.reset();
       this.page = 2;
-      if (this.tab === "owned")
+    },
+    async reset() {
+      let fetched = [];
+      if (this.tab === "owned") {
         fetched = await getDataByOwnerId(this.currentId, 1, this.limit);
+      }
 
-      if (this.tab === "all") fetched = await getAllData(1, this.limit);
+      if (this.tab === "all") {
+        fetched = await getAllData(1, this.limit);
+      }
+
+      if (this.tab === "blocked") {
+        fetched = await getDataByStatus("blocked", 1, this.limit);
+      }
+
       this.list = [...fetched];
     },
   },

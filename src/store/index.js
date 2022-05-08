@@ -13,11 +13,14 @@ export default createStore({
     SET_OWNER_DATA(state, data) {
       state.owner_data = data;
     },
+    SET_BLOCKED_DATA(state, data) {
+      state.blocked_data = data;
+    },
   },
   actions: {
     async getData({ commit }) {
       const res = await fetch(
-        `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data`
+        `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data?status=active`
       );
       commit("SET_DATA", await res.json());
     },
@@ -27,6 +30,12 @@ export default createStore({
       );
       commit("SET_OWNER_DATA", await res.json());
     },
+    async getBlockedData({ commit }) {
+      const res = await fetch(
+        `https://my-json-server.typicode.com/amolikvivian/cards-infinite-scroll/data?status=blocked`
+      );
+      commit("SET_BLOCKED_DATA", await res.json());
+    },
   },
   modules: {},
   getters: {
@@ -35,6 +44,9 @@ export default createStore({
     },
     ownerData(state) {
       return state.owner_data;
+    },
+    blockedData(state) {
+      return state.blocked_data;
     },
     cardholderNames(state) {
       return [
