@@ -1,7 +1,7 @@
 <template>
   <div class="px-4">
     <div class="mt-6">
-      <SearchFilter @search="search" @filter="filter" @clear="clear" />
+      <SearchFilter @search="search" @filter="getFilterParams" @clear="clear" />
     </div>
     <div class="my-8 flex flex-wrap justify-between">
       <Card v-for="(data, i) in list" :key="i" :card="data" />
@@ -24,10 +24,10 @@ import SearchFilter from "@/components/SearchFilter";
 import Observer from "@/components/Observer";
 import Loader from "@/components/Loader";
 import {
-  getAllData,
   getDataByOwnerId,
   getDataByStatus,
-} from "@/services/api.js";
+  getDataByName,
+} from "@/services/devapi.js";
 export default {
   name: "Home",
   components: {
@@ -38,25 +38,32 @@ export default {
   },
   data() {
     return {
+      all: [],
       list: [],
       page: 1,
       limit: 4,
+      total: null,
       loading: true,
       loadFlag: true,
-      limitFlag: false,
+      filterFlag: false,
+      type: null,
+      name: null,
     };
   },
+
   created() {
-    this.$store.dispatch("getData");
-    this.$store.dispatch("getOwnerData", this.currentId);
-    this.$store.dispatch("getBlockedData");
+    this.$store.dispatch("getNames");
   },
+
   computed: {
     currentId() {
       return this.$store.getters.currentId;
     },
     tab() {
       return this.$route.params.id;
+    },
+    limitFlag() {
+      return this.list.length === this.total;
     },
   },
   watch: {
@@ -66,27 +73,14 @@ export default {
       this.list = [];
       this.page = 1;
     },
-    list() {
-      if (this.tab === "owned") {
-        this.limitFlag =
-          this.list.length == this.$store.getters.ownerData.length;
-      }
-      if (this.tab === "all") {
-        this.limitFlag = this.list.length == this.$store.getters.all.length;
-      }
-      if (this.tab === "blocked") {
-        this.limitFlag =
-          this.list.length == this.$store.getters.blockedData.length;
-      }
-    },
   },
   methods: {
     async intersected() {
       if (this.loadFlag && !this.limitFlag) {
         this.loading = true;
-        let fetched = [];
+        let fetched;
         if (this.tab === "all") {
-          fetched = await getAllData(this.page, this.limit);
+          fetched = await getDataByStatus("active", this.page, this.limit);
         } else if (this.tab === "owned") {
           fetched = await getDataByOwnerId(
             this.currentId,
@@ -96,7 +90,11 @@ export default {
         } else if (this.tab === "blocked") {
           fetched = await getDataByStatus("blocked", this.page, this.limit);
         }
-        this.list = [...this.list, ...fetched];
+        console.log(fetched.data);
+        this.list = [...this.list, ...fetched.data];
+        if (this.filterFlag) this.filter(this.type, this.name, this.list);
+
+        this.total = fetched.total;
         this.page += 1;
         this.loading = false;
       }
@@ -105,63 +103,42 @@ export default {
       if (query.length === 0) {
         this.loadFlag = true;
         await this.reset();
-        this.page = 2;
       } else {
         this.loadFlag = false;
-        if (this.tab == "owned") {
-          this.list = this.$store.getters.ownerData.filter((card) => {
-            return card.name.toLowerCase().includes(query.toLowerCase());
-          });
-        } else if (this.tab == "all") {
-          this.list = this.$store.getters.all.filter((card) => {
-            return card.name.toLowerCase().includes(query.toLowerCase());
-          });
-        }
+        const res = await getDataByName(query);
+        this.list = res.data;
       }
     },
-    async filter({ type, name }) {
-      this.loadFlag = false;
-      let completeList;
-      if (this.tab == "owned") completeList = this.$store.getters.ownerData;
 
-      if (this.tab == "all") completeList = this.$store.getters.all;
-
-      if (this.tab == "blocked") completeList = this.$store.getters.blockedData;
-
+    getFilterParams({ type, name }) {
+      this.type = type;
+      this.name = name;
+      this.filter(type, name, this.list);
+    },
+    filter(type, name, some) {
+      this.filterFlag = true;
       if (type != null && name == null) {
-        this.list = completeList.filter((card) => {
+        this.list = some.filter((card) => {
           return card.card_type === type;
         });
       } else if (type == null && name != null) {
-        this.list = completeList.filter((card) => {
+        this.list = some.filter((card) => {
           return card.owner_name === name;
         });
-      } else {
-        this.list = completeList.filter((card) => {
+      } else if (type != null && name != null) {
+        this.list = some.filter((card) => {
           return card.owner_name === name && card.card_type === type;
         });
       }
     },
     async clear() {
+      this.filterFlag = false;
       this.loadFlag = true;
       await this.reset();
-      this.page = 2;
     },
     async reset() {
-      let fetched = [];
-      if (this.tab === "owned") {
-        fetched = await getDataByOwnerId(this.currentId, 1, this.limit);
-      }
-
-      if (this.tab === "all") {
-        fetched = await getAllData(1, this.limit);
-      }
-
-      if (this.tab === "blocked") {
-        fetched = await getDataByStatus("blocked", 1, this.limit);
-      }
-
-      this.list = [...fetched];
+      this.list = [];
+      this.page = 1;
     },
   },
 };
